@@ -1,0 +1,6 @@
+﻿  Source.c
+C:\Users\lovre\Desktop\programiranje\strukture-podataka\zdk2\zdk2\Source.c(45,4): warning C4013: 'addNewStudentToTheBack' undefined; assuming extern returning int
+C:\Users\lovre\Desktop\programiranje\strukture-podataka\zdk2\zdk2\Source.c(77): warning C4715: 'createPerson': not all control paths return a value
+C:\Users\lovre\Desktop\programiranje\strukture-podataka\zdk2\zdk2\Source.c(103): warning C4716: 'printList': must return a value
+C:\Users\lovre\Desktop\programiranje\strukture-podataka\zdk2\zdk2\Source.c(116): warning C4716: 'addNewStudentToTheBack': must return a value
+  zdk2.vcxproj -> C:\Users\lovre\Desktop\programiranje\strukture-podataka\zdk2\x64\Debug\zdk2.exe
