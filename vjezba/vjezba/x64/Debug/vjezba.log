@@ -1,0 +1,4 @@
+﻿  Source.c
+C:\Users\lovre\Desktop\programiranje\strukture-podataka\vjezba\vjezba\Source.c(67,10): warning C4098: 'newStudent': 'void' function returning a value
+C:\Users\lovre\Desktop\programiranje\strukture-podataka\vjezba\vjezba\Source.c(73,10): warning C4098: 'printStudents': 'void' function returning a value
+  vjezba.vcxproj -> C:\Users\lovre\Desktop\programiranje\strukture-podataka\vjezba\x64\Debug\vjezba.exe
