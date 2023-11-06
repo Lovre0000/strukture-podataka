@@ -1,0 +1,3 @@
+﻿  Source.c
+C:\Users\lovre\Desktop\programiranje\strukture-podataka\2.zdk\2.zdk\Source.c(95): warning C4715: 'addNewStudentToFront': not all control paths return a value
+  2.zdk.vcxproj -> C:\Users\lovre\Desktop\programiranje\strukture-podataka\2.zdk\x64\Debug\2.zdk.exe
