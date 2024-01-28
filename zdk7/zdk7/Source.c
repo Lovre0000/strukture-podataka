@@ -29,7 +29,7 @@ PositionDirectory pop(PositionLevelStack headLevelStack);
 int push(PositionLevelStack headLevelStack, PositionDirectory directoryLevel);
 PositionLevelStack createNewLevelStackElement(PositionDirectory directoryLevel);
 
-int main() {
+int main(void) {
     Directory headDirectory = {
         .name = {0},
         .subDirectories = NULL,
@@ -176,11 +176,13 @@ int push(PositionLevelStack headLevelStack, PositionDirectory directoryLevel) {
     newLevelStackElement = createNewLevelStackElement(directoryLevel);
     if (!newLevelStackElement) {
         perror("Error in creating new element!\n");
-        return NULL;
+        return EXIT_FAILURE;
     }
 
     newLevelStackElement->next = headLevelStack->next;
     headLevelStack->next = newLevelStackElement;
+
+    return EXIT_SUCCESS;
 }
 
 PositionLevelStack createNewLevelStackElement(PositionDirectory directoryLevel) {

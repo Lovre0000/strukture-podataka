@@ -33,7 +33,7 @@ int main(void) {
     Element HeadPoly2 = { .coefficient = 0, .exponent = 0, .next = NULL };
     Element HeadPolyAdd = { .coefficient = 0, .exponent = 0, .next = NULL };
     Element HeadPolyMultiply = { .coefficient = 0, .exponent = 0, .next = NULL };
-    char* fileName = "/Users/mosa21/programiranje/Strukture-podataka/vjezba4/vjezba4/polynomes.txt";
+    char* fileName = "polynomes.txt";
 
     if (readFile(&HeadPoly1, &HeadPoly2, fileName) == EXIT_SUCCESS)
     {

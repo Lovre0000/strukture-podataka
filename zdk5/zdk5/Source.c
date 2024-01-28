@@ -1,184 +1,226 @@
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-struct _element;
-typedef struct _element* Position;
-typedef struct _element {
-    int num;
+#define MAX_SIZE (50)
+#define MAX_LENGTH (1024)
+
+struct _StackElement;
+typedef struct _StackElement* Position;
+typedef struct _StackElement {
+    double number;
     Position next;
-    Position prev;
-}Element;
+}StackElement;
 
-int menu(Position Head);
-int enterElement(Position Head);
-Position createElement(void);
-int printList(Position First);
-int deleteList(Position Head);
-int deleteFromBehind(Position Head);
-Position findSecondToLast(Position Head);
-int deleteElement(Position Head);
+int calculatePostFix(Position Head, char* fileName, double* result);
+int readFile(char* fileName, char* buffer);
+int stringIntoPostFix(Position Head, char* buffer, double* result);
+int popAndOperation(Position Head, char operation, double* number);
+Position createStackElement(double number);
+int push(Position Head, Position newStackElement);
+int printStack(Position First);
+int pop(Position Head, double* operand);
+int checkStackAndGetResult(Position Head, double* result);
 
-int main(void) {
+int main(void)
+{
+    StackElement Head = { .number = 0, .next = NULL };
+    double result = 0;
 
-    Element Head = { .num = 0, .next = NULL, .prev = NULL };
-
-    menu(&Head);
-
-    return 0;
+    if (calculatePostFix(&Head, "postfix.txt", &result) == EXIT_SUCCESS)
+    {
+        printf("Result : %0.1lf\n", result);
+    }
+    return EXIT_SUCCESS;
 }
 
-int menu(Position Head)
+int calculatePostFix(Position Head, char* fileName, double* result)
 {
-    char c;
+    char buffer[MAX_LENGTH] = { 0 };
+    int status = 0;
 
-    while (1)
+    if (readFile(fileName, buffer) != EXIT_SUCCESS)
     {
-        printf("A - enter list, B - print list, C - delete list, D - delete from behind, E - delete element\n");
-        scanf(" %c", &c);
-        switch (c)
+        return EXIT_FAILURE;
+    }
+
+    status = stringIntoPostFix(Head, buffer, result);
+    if (status != EXIT_SUCCESS)
+    {
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+int readFile(char* fileName, char* buffer)
+{
+    FILE* filePtr = NULL;
+    filePtr = fopen(fileName, "r");
+    if (!filePtr)
+    {
+        printf("Can't open file!\n");
+        return EXIT_FAILURE;
+    }
+    fgets(buffer, MAX_LENGTH, filePtr);
+    printf("|%s|\n", buffer);
+
+    fclose(filePtr);
+
+    return EXIT_SUCCESS;
+}
+
+int stringIntoPostFix(Position Head, char* buffer, double* result)
+{
+    char* currentBuffer = buffer;
+    int status = 0;
+    int numBytes = 0;
+    char operation = 0;
+    double number = 0.0;
+    Position newStackElement = NULL;
+
+    while (strlen(currentBuffer) > 0)
+    {
+        status = sscanf(currentBuffer, " %lf %n", &number, &numBytes);
+        if (status != 1)
         {
-        case 'A':
-        case 'a':
-            enterElement(Head);
-            continue;
-
-        case 'B':
-        case 'b':
-            printList(Head->next);
-            continue;
-
-        case 'C':
-        case 'c':
-            deleteList(Head);
-            continue;
-
-        case 'D':
-        case 'd':
-            deleteFromBehind(Head);
-            continue;
-
-        case 'E':
-        case 'e':
-            deleteElement(Head);
-            continue;
-
+            sscanf(currentBuffer, " %c %n", &operation, &numBytes);
+            status = popAndOperation(Head, operation, result);
+            if (status != EXIT_SUCCESS)
+            {
+                return EXIT_FAILURE;
+            }
+            number = *result;
         }
+        newStackElement = createStackElement(number);
+        if (!newStackElement)
+        {
+            return EXIT_FAILURE;
+        }
+
+        currentBuffer += numBytes;
+        printf("|%s| <-->", currentBuffer);
+        push(Head, newStackElement);
+
     }
-    return EXIT_SUCCESS;
+    return checkStackAndGetResult(Head, result);
 }
-
-int enterElement(Position Head)
+int popAndOperation(Position Head, char operation, double* number)
 {
-    Position newElement = createElement();
+    double operand1 = 0;
+    double operand2 = 0;
+    int status1 = 0;
+    int status2 = 0;
 
-    newElement->next = Head->next;
-    Head->next = newElement;
-    newElement->prev = Head;
-    if (newElement->next)
+    status1 = pop(Head, &operand1);
+    if (status1 != EXIT_SUCCESS)
     {
-        newElement->next->prev = newElement;
+        return EXIT_FAILURE;
+    }
+
+    status2 = pop(Head, &operand2);
+    if (status2 != EXIT_SUCCESS)
+    {
+        return EXIT_FAILURE;
+    }
+
+    switch (operation)
+    {
+    case '+':
+        *number = operand2 + operand1;
+        break;
+    case '-':
+        *number = operand2 - operand1;
+        break;
+    case '*':
+        *number = operand2 * operand1;
+        break;
+    case '/':
+        *number = operand2 / operand1;
+        break;
+    default:
+        printf("Wrong operation!\n");
+        return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
 }
 
-Position createElement(void)
+Position createStackElement(double number)
 {
-    int num = 0;
-    Position newElement = NULL;
+    Position newStackElement = NULL;
 
-    newElement = (Position)malloc(sizeof(Element));
-    if (!newElement)
+    newStackElement = (Position)malloc(sizeof(StackElement));
+    if (!newStackElement)
     {
         printf("Failed to allocate memory!\n");
         return NULL;
     }
 
-    printf("Enter num: ");
-    scanf("%d", &num);
+    newStackElement->next = NULL;
+    newStackElement->number = number;
 
-    newElement->num = num;
-
-    return newElement;
+    return newStackElement;
 }
 
-int printList(Position First)
+int push(Position Head, Position newStackElement)
 {
-    if (!First)
-    {
-        printf("Empty list!\n");
-        return EXIT_FAILURE;
-    }
-    while (First)
-    {
-        printf("%d\n", First->num);
-        First = First->next;
-    }
+    newStackElement->next = Head->next;
+    Head->next = newStackElement;
+
+    printStack(Head->next);
+
     return EXIT_SUCCESS;
 }
 
-int deleteList(Position Head)
+int printStack(Position First)
 {
-    if (!Head->next)
+    Position current = First;
+
+    while (current)
     {
-        printf("Empty list!\n");
-        return EXIT_SUCCESS;
+        printf("%0.1lf", current->number);
+        current = current->next;
     }
-    while (Head->next)
-    {
-        Position toDelete = Head->next;
-        Head->next = toDelete->next;
-        free(toDelete);
-    }
+    printf("\n");
+
     return EXIT_SUCCESS;
 }
 
-int deleteFromBehind(Position Head)
+int pop(Position Head, double* operand)
 {
     Position toDelete = NULL;
-    Position Last = NULL;
-    while (Head->next)
+
+    toDelete = Head->next;
+    if (!toDelete)
     {
-        Last = findSecondToLast(Head);
-        toDelete = Last->next;
-        Last->next = toDelete->next;
-        free(toDelete);
+        printf("Empty stack!\n");
+        return -1;
     }
+
+    Head->next = toDelete->next;
+    *operand = toDelete->number;
+    free(toDelete);
+
     return EXIT_SUCCESS;
 }
 
-Position findSecondToLast(Position Head)
+int checkStackAndGetResult(Position Head, double* result)
 {
-    Position Last = Head;
-    Position SecondToLast = NULL;
+    int status = EXIT_SUCCESS;
 
-    while (Last->next)
+    status = pop(Head, result);
+
+    if (status != EXIT_SUCCESS)
     {
-        SecondToLast = Last;
-        Last = Last->next;
+        return status;
     }
-    return SecondToLast;
-}
 
-
-int deleteElement(Position Head)
-{
-    Position temp = NULL;
-    int num1 = 0;
-
-    printf("Enter num to find: ");
-    scanf("%d", &num1);
-
-    while (Head->next && Head->next->num != num1)
+    if (Head->next)
     {
-        Head = Head->next;
+        system("cls");
+        printf("Invalid postfix, please check the file!\n");
+        return EXIT_FAILURE;
     }
-    if (Head->next->num == num1)
-    {
-        temp = Head->next;
-        Head->next = temp->next;
-        if (temp->next)
-            temp->next->prev = Head;
-        free(temp);
-    }
+
     return EXIT_SUCCESS;
 }
